@@ -1,0 +1,8 @@
+OBJ_THRESH = 0.25
+NMS_THRESH = 0.45
+IMG_SIZE = 640
+
+
+CLASSES = (
+    "UAV"
+)
