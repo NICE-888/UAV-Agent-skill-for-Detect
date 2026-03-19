@@ -1,99 +1,50 @@
 # UAV-Agent-skill-for-Detect
 
-基于 RK3588 + RKNN 的无人机目标检测开源项目骨架，适合部署在 Rockchip RK3588 设备上进行图片、视频和摄像头推理。
+基于 **RK3588 + RKNN** 的无人机目标检测项目。  
+本项目提供一个可部署在边缘设备上的目标检测推理方案，支持使用你自训练导出的 `UAV.rknn` 模型进行图像、视频和摄像头输入的检测。
 
-## 项目特点
+## Features
 
-- 基于 `rknnlite` 的 RKNN 推理
-- 支持 RK3588 NPU 多核并行
-- 保留你现有的后处理、DFL、NMS 和绘框流程
-- 支持单图、视频、摄像头三种输入
-- 已预留 `UAV.rknn` 模型位置，便于后续发布到 GitHub Releases
+- 基于 **RK3588** 平台部署
+- 使用 **RKNN** 模型推理
+- 支持 **图像 / 视频 / 摄像头** 输入
+- 集成 **多线程推理池**，提升检测吞吐
+- 适合边缘端无人机目标检测场景
+- 支持替换为你自己的 `UAV.rknn` 权重
 
-## 目录结构
+---
+
+## Project Overview
+
+本项目主要用于在 RK3588 设备上运行无人机目标检测模型。  
+核心流程包括：
+
+1. 读取图像 / 视频流
+2. 送入 RKNN 模型进行推理
+3. 对模型输出进行后处理（解码、筛选、NMS）
+4. 在结果图像上绘制检测框
+5. 输出可视化检测结果
+
+---
+
+## Project Structure
 
 ```text
 UAV-Agent-skill-for-Detect/
-├── README.md
-├── LICENSE
-├── .gitignore
-├── requirements.txt
-├── main.py
+├── README.md                  # 项目说明
+├── LICENSE                    # 开源许可证
+├── requirements.txt           # Python 依赖
+├── main.py                    # 主入口
+├── func.py                    # 后处理、绘框等核心逻辑
+├── rknnpool.py                # RKNN 多线程推理池
 ├── scripts/
-│   ├── infer_image.py
-│   └── run_detector.py
+│   ├── infer_image.py         # 单张图片推理示例
+│   └── run_detector.py        # 视频/摄像头推理示例
 ├── src/
-│   └── uav_detector/
-│       ├── __init__.py
-│       ├── config.py
-│       ├── detector.py
-│       ├── postprocess.py
-│       └── rknn_pool.py
+│   └── uav_detector/          # 模块化源码
 ├── docs/
-│   ├── deployment.md
-│   └── release-guide.md
-├── assets/
-│   ├── demo/
-│   │   └── README.md
-│   └── models/
-│       └── README.md
-└── tests/
-    └── test_import.py
-```
-
-## 环境要求
-
-- Python 3.8+
-- RK3588 / RK356x 等 Rockchip NPU 平台
-- `rknn-toolkit-lite2` 或对应 `rknnlite` 运行环境
-- OpenCV
-- NumPy
-
-## 快速开始
-
-### 1. 安装依赖
-
-```bash
-pip install -r requirements.txt
-```
-
-### 2. 放置模型
-
-将你训练导出的 `UAV.rknn` 放到：
-
-```text
-assets/models/UAV.rknn
-```
-
-### 3. 运行视频检测
-
-```bash
-python main.py --source ./demo.mp4 --model assets/models/UAV.rknn
-```
-
-### 4. 运行图片检测
-
-```bash
-python scripts/infer_image.py --image ./test.jpg --model assets/models/UAV.rknn --output ./output.jpg
-```
-
-## 关于类别名
-
-当前代码默认继承了你上传文件中的 COCO 类别列表，因此你在发布前应把 `src/uav_detector/config.py` 中的 `CLASSES` 改成你真实训练时的类别，例如：
-
-```python
-CLASSES = ("uav",)
-```
-
-## 模型权重发布建议
-
-不建议把 `UAV.rknn` 直接提交到 Git 仓库。
-推荐做法：
-
-1. 源码推送到 GitHub 仓库
-2. 在 GitHub Releases 中上传 `UAV.rknn`
-3. 在 README 中说明下载方式
-
-## 致谢
-
-后处理结构基于 Rockchip RKNN Toolkit 示例演化而来，并保留了你的 DFL、NMS、多线程推理池实现思路。
+│   ├── deployment.md          # 部署说明
+│   └── release-guide.md       # 发布说明
+└── assets/
+    ├── demo/                  # 示例数据
+    └── models/                # 模型权重目录
